@@ -1,0 +1,14 @@
+name: UberData
+title: UberData
+username:
+account: jasondonohue20
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8929919
+bundleId: 7125528
+url: https://jasondonohue20.shinyapps.io/UberData/
+when: 1682292879.52173
+lastSyncTime: 1682292879.52175
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: uber_data.R|original data
