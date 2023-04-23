@@ -55,8 +55,12 @@ trips_by_base_day <- uber_data %>%
   group_by(base = Base, day_of_week) %>%
   summarise(trips = n()) %>%
   arrange(base, day_of_week)
+  
+  trips_by_lat_lon <- uber_data %>%
+  group_by(lat = Lat, lon = Lon) %>%
+  summarise(trips = n()) 
   ```
-  I created 8 different tables to make it easier to see how each data related. This made it easier to create pivot tables and graphs in the shiny app based on what was in these tables I created.
+  I created 9 different tables to make it easier to see how each data related. This made it easier to create pivot tables and graphs in the shiny app based on what was in these tables I created.
   
   # code to create csv files 
   
@@ -69,23 +73,33 @@ write.csv(trips_by_base_month, file = "trips_by_base_month.csv")
 write.csv(trips_by_hour_day, file = "trips_by_hour_day.csv")
 write.csv(trips_by_base_day, file = "trips_by_base_day.csv")
 write.csv(trips_by_month_week, file = "trips_by_month_week.csv")
+write.csv(trips_by_lat_lon, file = "trips_by_lat_lon.csv")
 ```
 I used the tables that I made and changed them all into csv files and created another r script to run just using these new csv files. This allowed R to run much faster and take up less memory. 
 
 # code to explain outputs
 ```
-column(2.5, textOutput("text_output1")),
+tabPanel("table",
+             fluidRow(
+               column(2.5, textOutput("text_output1")),
+               column(3.5,DT::dataTableOutput("table", width = "100%")))),
 
-column(3.5,DT::dataTableOutput("table", width = "100%")),
+tabPanel("plot1",
+             fluidRow(
+               column(7, textOutput("text_output2")),
+               column(8,plotOutput('plot_01', width = '1000px')))),
 
-column(8,plotOutput('plot_01', width = '1000px')),
+tabPanel("model", 
+             fluidRow(
+               column(12, textOutput("text_output13")),
+               column(12, plotOutput("model1"))))
 
-column(12,plotOutput('heatmap_1', width = '1000px')),
+
 ```
 
 I created different outputs to show text, tables, graphs, and heatmaps.
 
-# code to show graphs and tables and heatmaps
+# code to show graphs, tables, heatmaps, leaflet, and model
 
 ```
 output$text_output1 <- renderText({ text1 })
@@ -110,9 +124,22 @@ output$text_output1 <- renderText({ text1 })
       xlab("hour") + 
       ylab("day")  
   })
+  
+  output$leaf <- renderLeaflet({
+    leaflet(head(trips_by_lat_lon, 2000)) %>%
+      addTiles() %>%
+      addMarkers(~lon, ~lat, popup = "trips")
+  })
+  
+  output$model1 <- renderPlot({
+    model <- lm(trips ~ month, data = trips_by_full_month)
+    predictions <- predict(model)
+    observed <- trips_by_full_month$trips
+    plot(predictions, observed, xlab = "Predicted", ylab = "Observed")
 ```
 
 I created different ggplots by using geom_col() and geom_tile(). To create the table I used renderDataTable().  I used stacked bar graphs and regular bar graphs to show the different data. 
 
 
-
+# shinny url
+http://jasondonohue20.shinyapps.io/UberData?_ga=2.128592206.358588650.1682270343-746115546.1677884294
